@@ -1,3 +1,5 @@
+
+
 import '../App.css';
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
@@ -12,20 +14,35 @@ import AddIcon from '@mui/icons-material/Add';
 import EditTask from './EditTask';
 import ChangeStatus from './ChangeStatus';
 import { useSelector, useDispatch } from 'react-redux';
-import {addTask, setTasks, deleteTask, updateTask  } from '../store/taskSlice';
+import { addTask, setTasks, deleteTask, updateTask } from '../store/taskSlice';
+
 const DetailsProject = () => {
 
-    const { AllProjectId } = useParams(); 
-    const dispatch=useDispatch();
+    const { AllProjectId } = useParams();
+    const dispatch = useDispatch();
     const [currentPage, setCurrentPage] = useState('details');
     const [menuData, setMenuData] = useState({ anchorEl: null, task: null });
+    
+    // שליפת המשימות
     const tasks = useSelector((state) => state.tasks.items);
 
-    // שמירת הנתונים בכל פעם שהמערך tasks משתנה
+    // --- תיקון ה-ID: שליפת שם הפרויקט ---
+    const reduxProjects = useSelector((state) => state.projects || []);
+    const staticProjects = [
+        { id: 'react-proj', name: 'ריאקט' },
+        { id: 'csharp-proj', name: 'C#' },
+        { id: 'node-proj', name: 'Node.js' },
+        { id: 'python-proj', name: 'Python' }
+    ];
+    
+    // איחוד ומציאת הפרויקט הנוכחי
+    const allProjects = [...staticProjects, ...reduxProjects];
+    const currentProject = allProjects.find(p => p.id === AllProjectId);
+    // ------------------------------------
+
     useEffect(() => {
         dispatch(setTasks({ projectId: AllProjectId }));
-    }, [AllProjectId,dispatch]);
-    // פונקציה שמוסיפה משימה חדשה למערך
+    }, [AllProjectId, dispatch]);
 
     const handleOpenMenu = (event, task) => {
         setMenuData({ anchorEl: event.currentTarget, task: task });
@@ -34,6 +51,7 @@ const DetailsProject = () => {
     const handleCloseMenu = () => {
         setMenuData({ anchorEl: null, task: null });
     };
+
     const columns = [
         { id: 'todo', title: 'משימות שלא בוצעו', color: '#4caf50' },
         { id: 'in-progress', title: 'בביצוע מפתח', color: '#ff9800' },
@@ -41,19 +59,18 @@ const DetailsProject = () => {
         { id: 'done', title: 'נבדקו ובוצעו', color: '#2196f3' },
     ];
 
-    // מחיקת משימה 
     const DeleteTask = () => {
         if (menuData.task) {
             dispatch(deleteTask({ projectId: AllProjectId, taskId: menuData.task.id }));
             handleCloseMenu();
         }
     };
-      // פונקציה לעדכון משימה קיימת במערך
-      const onSaveUpdate = (updatedTask) => {
+
+    const onSaveUpdate = (updatedTask) => {
         dispatch(updateTask({ projectId: AllProjectId, updatedTask }));
         setCurrentPage('details');
     };
-    //  בדיקה: אם המצב הוא 'add-task', נציג רק את קומפוננטת הוספת המשימה
+
     if (currentPage === 'add-task') {
         return <AddTask onSave={(newTask) => {
             dispatch(addTask({ projectId: AllProjectId, task: newTask }));
@@ -61,8 +78,7 @@ const DetailsProject = () => {
         }}
             onBack={() => setCurrentPage('details')} />;
     }
-  
-    // עריכת משימה
+
     if (currentPage === 'edit-task' && menuData.task) {
         return (
             <EditTask
@@ -72,7 +88,7 @@ const DetailsProject = () => {
             />
         );
     }
-    // שינוי סטטוס
+
     if (currentPage === 'change-status' && menuData.task) {
         return (
             <ChangeStatus
@@ -82,17 +98,18 @@ const DetailsProject = () => {
             />
         );
     }
+
     return (
         <>
             <Box sx={{ p: 4, bgcolor: '#f5f5f5', minHeight: '100vh', direction: 'rtl' }}>
                 <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', mb: 4 }}>
-                    פרטי פרויקט: {AllProjectId}
+                    {/* תיקון: מציג את שם הפרויקט אם נמצא, אחרת מציג את ה-ID כברירת מחדל */}
+                    פרטי פרויקט: {currentProject ? currentProject.name : AllProjectId}
                 </Typography>
                 <Grid container spacing={3}>
                     {columns.map((column) => (
                         <Grid item xs={12} sm={6} md={3} key={column.id}>
                             <Paper elevation={2} sx={{ p: 2, borderRadius: 2, bgcolor: '#ebedf0', minHeight: 400 }}>
-                                {/* כותרת העמודה עם 3 נקודות */}
                                 <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
                                     <Stack direction="row" spacing={1} alignItems="center">
                                         <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: column.color }} />
@@ -101,9 +118,7 @@ const DetailsProject = () => {
                                         </Typography>
                                     </Stack>
                                 </Stack>
-                                {/* אזור הצגת המשימות */}
                                 <Box sx={{ flexGrow: 1 }}>
-                                    {/* סינון המשימות שמתאימות לעמודה הנוכחית */}
                                     {tasks.filter(t => t.status === column.id).length > 0 ? (
                                         tasks.filter(t => t.status === column.id).map((task) => (
                                             <Paper
@@ -143,7 +158,7 @@ const DetailsProject = () => {
                                 <Button
                                     startIcon={<AddIcon />}
                                     fullWidth
-                                    onClick={() => setCurrentPage('add-task')} // משנה את ה-State
+                                    onClick={() => setCurrentPage('add-task')}
                                     sx={{ justifyContent: 'flex-start', color: 'text.secondary', textTransform: 'none' }}>
                                     הוסף משימה
                                 </Button>
@@ -152,7 +167,6 @@ const DetailsProject = () => {
                     ))}
                 </Grid>
 
-                {/* תפריט אפשרויות (נפתח בלחיצה על 3 נקודות) */}
                 <Menu
                     anchorEl={menuData.anchorEl}
                     open={Boolean(menuData.anchorEl)}
@@ -163,14 +177,12 @@ const DetailsProject = () => {
                     <MenuItem onClick={() => {
                         setMenuData({ anchorEl: null, task: menuData.task });
                         setCurrentPage('edit-task');
-                        // handleCloseMenu();
                     }}>
                         <EditIcon fontSize="small" sx={{ ml: 1 }} /> עריכת משימה
                     </MenuItem>
                     <MenuItem onClick={() => {
                         setMenuData({ anchorEl: null, task: menuData.task });
                         setCurrentPage('change-status');
-                        // handleCloseMenu();
                     }}>
                         <EditIcon fontSize="small" sx={{ ml: 1 }} />שינוי סטטוס משימה
                     </MenuItem>
