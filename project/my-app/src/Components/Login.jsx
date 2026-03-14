@@ -22,7 +22,7 @@ const Login = () =>{
     }
     return(
         <>
-        Login
+        {/* Login */}
         <h1>להרשמה ולהתחברות</h1>
         {/* הצגת שגיאה במידה והנתונים לא נכונים */}
         {authError && <p style={{ color: 'red', fontWeight: 'bold' }}>{authError}</p>}

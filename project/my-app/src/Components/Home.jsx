@@ -1,14 +1,14 @@
 import { Link } from "react-router-dom";
 
 const Home = () => {
-    return(
+    return (
         <>
-       Home-דף הבית
-    <div>
-      <h1>מערכת לניהול פרויקטים</h1>
-    </div>
-    {/* <Link to='/AllProject'>פרויקטים שלי</Link><br /> */}
-    <Link to='/Login'>Login-להרשמה ולהתחברות</Link>
+            {/* Home-דף הבית */}
+            <div>
+                <h1>מערכת לניהול פרויקטים</h1>
+            </div>
+            {/* <Link to='/AllProject'>פרויקטים שלי</Link><br /> */}
+            <Link to='/Login'>Login-להרשמה ולהתחברות</Link>
         </>
     )
 }

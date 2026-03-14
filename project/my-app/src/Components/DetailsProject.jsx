@@ -22,7 +22,7 @@ const DetailsProject = () => {
     const dispatch = useDispatch();
     const [currentPage, setCurrentPage] = useState('details');
     const [menuData, setMenuData] = useState({ anchorEl: null, task: null });
-    
+
     // שליפת המשימות
     const tasks = useSelector((state) => state.tasks.items);
 
@@ -34,7 +34,7 @@ const DetailsProject = () => {
         { id: 'node-proj', name: 'Node.js' },
         { id: 'python-proj', name: 'Python' }
     ];
-    
+
     // איחוד ומציאת הפרויקט הנוכחי
     const allProjects = [...staticProjects, ...reduxProjects];
     const currentProject = allProjects.find(p => p.id === AllProjectId);
@@ -102,10 +102,10 @@ const DetailsProject = () => {
     return (
         <>
             <Box sx={{ p: 4, bgcolor: '#f5f5f5', minHeight: '100vh', direction: 'rtl' }}>
-                <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', mb: 4 }}>
-                    {/* תיקון: מציג את שם הפרויקט אם נמצא, אחרת מציג את ה-ID כברירת מחדל */}
+                <Typography variant="h3" gutterBottom sx={{ fontWeight: 900, mb: 4, color: '#1976d2' }}>
                     פרטי פרויקט: {currentProject ? currentProject.name : AllProjectId}
                 </Typography>
+
                 <Grid container spacing={3}>
                     {columns.map((column) => (
                         <Grid item xs={12} sm={6} md={3} key={column.id}>
